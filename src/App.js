@@ -6,20 +6,35 @@ const BASE_URL = "https://api.exchangeratesapi.io/latest";
 
 function App() {
   const [currencyOptions, setCurrencyOptions] = useState([]);
+  const [fromCurrency, setFromCurrency] = useState();
+  const [toCurrency, setToCurrency] = useState();
 
   useEffect(() => {
     fetch(BASE_URL)
       .then(res => res.json())
-      .then(data => setCurrencyOptions([data.base, ...Object.keys(data.rates)]))
+      .then(data => {
+        const firstCurrency = Object.keys(data.rates)[0];
+        setCurrencyOptions([data.base, ...Object.keys(data.rates)]);
+        setFromCurrency(data.base);
+        setToCurrency(firstCurrency);
+      })
       .catch(err => console.log(err));
   }, [])
 
   return (
     <div className="">
       <h1>Converter</h1>
-      <CurrencyRow currencyOptions={currencyOptions} />
+      <CurrencyRow
+        currencyOptions={currencyOptions}
+        selectedCurrency={fromCurrency}
+        onChangeCurrency={e => setFromCurrency(e.target.value)}
+      />
       <span className="equals">=</span>
-      <CurrencyRow currencyOptions={currencyOptions} />
+      <CurrencyRow
+        currencyOptions={currencyOptions}
+        selectedCurrency={toCurrency}
+        onChangeCurrency={e => setToCurrency(e.target.value)}
+      />
     </div>
   );
 }
